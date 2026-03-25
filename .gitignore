@@ -35,5 +35,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# project contexts
+/context
+
 .vercel
 .env*.local

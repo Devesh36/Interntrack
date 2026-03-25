@@ -1064,12 +1064,15 @@ export default function StudentDashboard() {
                     </div>
                   ) : (
                     filteredForms.map((form) => (
-                      <Card key={form.id}>
+                      <Card
+                        key={form.id}
+                        className="group border-gray-200 shadow-sm transition-all duration-200 hover:border-gray-300 hover:shadow-md"
+                      >
                         <CardHeader>
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
                               <div
-                                className={`w-10 h-10 rounded-[9px] border border-gray-200 bg-[#fafafa] grid place-items-center text-sm font-bold flex-shrink-0 ${getCompanyColor(form.companyName)}`}
+                                className={`grid h-10 w-10 flex-shrink-0 place-items-center rounded-[9px] border border-gray-200 bg-[#fafafa] text-sm font-bold transition-colors duration-200 group-hover:border-gray-300 group-hover:bg-white ${getCompanyColor(form.companyName)}`}
                               >
                                 {getInitials(form.companyName)}
                               </div>

@@ -1,14 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
-  BarChart,
-  Bar,
   PieChart,
   Pie,
   Cell,
-  XAxis,
-  YAxis,
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
@@ -18,6 +14,14 @@ import {
   ChartLegend,
   NoChartData,
 } from "./chart-tooltip";
+import { AnalyticsBarChart } from "./analytics-bar-chart";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   BRANCH_COLORS,
   COLORS,
@@ -32,6 +36,8 @@ interface DistributionChartsProps {
 }
 
 export function DistributionCharts({ filteredData }: DistributionChartsProps) {
+  const [selectedTimelineYear, setSelectedTimelineYear] = useState("");
+
   const companyDonutData = useMemo(() => {
     const top5 = filteredData.companyDistribution.slice(0, 5);
     const othersCount = filteredData.companyDistribution
@@ -79,6 +85,26 @@ export function DistributionCharts({ filteredData }: DistributionChartsProps) {
   const hasStipendData = stipendChartData.length > 0;
   const hasStipendAmountData = stipendAmountChartData.length > 0;
   const hasModeData = modeChartData.length > 0;
+  const timelineYears = filteredData.submissionTimelineByYear.map(
+    (entry) => entry.year,
+  );
+  const selectedTimelineData =
+    filteredData.submissionTimelineByYear.find(
+      (entry) => entry.year === selectedTimelineYear,
+    ) || filteredData.submissionTimelineByYear.at(-1);
+  const hasTimelineData =
+    selectedTimelineData?.months.some((month) => month.count > 0) ?? false;
+
+  useEffect(() => {
+    if (!timelineYears.length) {
+      setSelectedTimelineYear("");
+      return;
+    }
+
+    if (!timelineYears.includes(selectedTimelineYear)) {
+      setSelectedTimelineYear(timelineYears[timelineYears.length - 1]);
+    }
+  }, [selectedTimelineYear, timelineYears]);
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -94,39 +120,18 @@ export function DistributionCharts({ filteredData }: DistributionChartsProps) {
         </div>
         {hasBranchData ? (
           <>
-            <div className="h-[200px] mt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={filteredData.branchDistribution}>
-                  <XAxis
-                    dataKey="branch"
-                    tick={{ fontSize: 13 }}
-                    tickLine={false}
-                    axisLine={false}
-                    interval={0}
-                    tickFormatter={(v: string) =>
-                      v.length > 8 ? v.substring(0, 8) + "..." : v
-                    }
-                  />
-                  <YAxis
-                    tick={{ fontSize: 13 }}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <Tooltip content={<ChartTooltip />} />
-                  <Bar dataKey="count" radius={[6, 6, 0, 0]}>
-                    {filteredData.branchDistribution.map((entry, i) => (
-                      <Cell
-                        key={entry.branch}
-                        fill={
-                          BRANCH_COLORS[entry.branch] ||
-                          PALETTE[i % PALETTE.length]
-                        }
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            <AnalyticsBarChart
+              data={filteredData.branchDistribution}
+              xKey="branch"
+              yKey="count"
+              height={200}
+              xTickFormatter={(value) =>
+                value.length > 8 ? value.substring(0, 8) + "..." : value
+              }
+              getBarFill={(entry, i) =>
+                BRANCH_COLORS[entry.branch] || PALETTE[i % PALETTE.length]
+              }
+            />
             <ChartLegend
               items={filteredData.branchDistribution.map((b, i) => ({
                 label: b.branch,
@@ -246,33 +251,13 @@ export function DistributionCharts({ filteredData }: DistributionChartsProps) {
         </div>
         {hasStipendAmountData ? (
           <>
-            <div className="h-[180px] mt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={stipendAmountChartData}>
-                  <XAxis
-                    dataKey="range"
-                    tick={{ fontSize: 13 }}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 13 }}
-                    tickLine={false}
-                    axisLine={false}
-                    allowDecimals={false}
-                  />
-                  <Tooltip content={<ChartTooltip />} />
-                  <Bar dataKey="count" radius={[6, 6, 0, 0]}>
-                    {stipendAmountChartData.map((entry, i) => (
-                      <Cell
-                        key={entry.range}
-                        fill={PALETTE[(i + 2) % PALETTE.length]}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            <AnalyticsBarChart
+              data={stipendAmountChartData}
+              xKey="range"
+              yKey="count"
+              height={180}
+              getBarFill={(_, i) => PALETTE[(i + 2) % PALETTE.length]}
+            />
             <div className="mt-3 rounded-lg border border-[#e8eaed] bg-[#fafafa] px-3 py-2">
               <div className="text-xs uppercase tracking-[0.06em] text-[#878c97]">
                 Summary
@@ -315,32 +300,13 @@ export function DistributionCharts({ filteredData }: DistributionChartsProps) {
         </div>
         {hasModeData ? (
           <>
-            <div className="h-[180px] mt-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={modeChartData}>
-                  <XAxis
-                    dataKey="mode"
-                    tick={{ fontSize: 13 }}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    tick={{ fontSize: 13 }}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <Tooltip content={<ChartTooltip />} />
-                  <Bar dataKey="count" radius={[6, 6, 0, 0]}>
-                    {modeChartData.map((entry) => (
-                      <Cell
-                        key={entry.mode}
-                        fill={MODE_COLORS[entry.mode] || "#9ca3af"}
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            <AnalyticsBarChart
+              data={modeChartData}
+              xKey="mode"
+              yKey="count"
+              height={180}
+              getBarFill={(entry) => MODE_COLORS[entry.mode] || "#9ca3af"}
+            />
             <ChartLegend
               items={modeChartData.map((d) => ({
                 label: `${d.mode} (${d.count})`,
@@ -351,6 +317,65 @@ export function DistributionCharts({ filteredData }: DistributionChartsProps) {
           </>
         ) : (
           <NoChartData message="No internship mode data available for the current filters" />
+        )}
+      </div>
+
+      {/* Submission Timeline */}
+      <div className="bg-white border border-[#e8eaed] rounded-[14px] p-5 transition-shadow hover:shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+        <div className="flex items-start justify-between gap-3 mb-1">
+          <div>
+            <div className="text-base font-semibold text-[#111318] tracking-[-0.01em]">
+              Submission Timeline
+            </div>
+            <div className="text-sm text-[#878c97] mt-0.5">
+              Monthly submission pattern for the selected academic year
+            </div>
+          </div>
+          <Select
+            value={selectedTimelineYear}
+            onValueChange={setSelectedTimelineYear}
+            disabled={!timelineYears.length}
+          >
+            <SelectTrigger className="w-[124px] h-9 rounded-lg border-[#d1d5dc] text-sm bg-white">
+              <SelectValue placeholder="Select year" />
+            </SelectTrigger>
+            <SelectContent>
+              {timelineYears.map((year) => (
+                <SelectItem key={year} value={year}>
+                  {year}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        {hasTimelineData && selectedTimelineData ? (
+          <>
+            <AnalyticsBarChart
+              data={selectedTimelineData.months}
+              xKey="month"
+              yKey="count"
+              height={160}
+              yAxisWidth={24}
+              getBarFill={(entry, index) =>
+                index === selectedTimelineData.months.length - 1
+                  ? "#16a34a"
+                  : "#dcfce7"
+              }
+            />
+            <div className="mt-3 rounded-lg border border-[#e8eaed] bg-[#fafafa] px-3 py-2">
+              <div className="text-xs uppercase tracking-[0.06em] text-[#878c97]">
+                Scope
+              </div>
+              <div className="mt-1 text-sm text-[#3d4047]">
+                Showing month-wise submissions for{" "}
+                <span className="font-semibold text-[#111318]">
+                  {selectedTimelineData.year}
+                </span>
+              </div>
+            </div>
+          </>
+        ) : (
+          <NoChartData message="No monthly submission data available for the current filters" />
         )}
       </div>
     </div>

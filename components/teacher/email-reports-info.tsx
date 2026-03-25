@@ -58,7 +58,7 @@ export function EmailReportsInfo() {
 
   return (
     <div className="space-y-6 w-full">
-      <Card className="w-full">
+      <Card className="w-full shadow-sm">
         <CardHeader className="p-4 sm:p-6">
           <CardTitle className="flex items-center gap-2 text-lg sm:text-xl">
             <Mail className="w-5 h-5 text-blue-600 flex-shrink-0" />
@@ -159,7 +159,7 @@ export function EmailReportsInfo() {
       </Card>
 
       {/* Email Preview */}
-      <Card className="w-full">
+      <Card className="w-full shadow-sm">
         <CardHeader className="p-4 sm:p-6">
           <CardTitle className="text-lg sm:text-xl">Email Preview</CardTitle>
         </CardHeader>

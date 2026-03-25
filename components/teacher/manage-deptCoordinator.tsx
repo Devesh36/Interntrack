@@ -137,7 +137,7 @@ export function ManageDeptCoordinators() {
 
   return (
     <div className="space-y-6">
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Add Department Coordinator</CardTitle>
           <CardDescription>
@@ -196,7 +196,7 @@ export function ManageDeptCoordinators() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="shadow-sm">
         <CardHeader>
           <CardTitle>Current Coordinators</CardTitle>
         </CardHeader>
@@ -214,7 +214,7 @@ export function ManageDeptCoordinators() {
               {coordinators.map((coord) => (
                 <div
                   key={coord.id}
-                  className="flex items-center justify-between p-4 border rounded-lg"
+                  className="flex items-center justify-between rounded-lg border p-4 transition-colors duration-200 hover:border-gray-300 hover:bg-gray-50/70"
                 >
                   <div>
                     <p className="font-medium">{coord.branch}</p>

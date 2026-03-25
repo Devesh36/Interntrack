@@ -32,6 +32,16 @@ export interface YearAnalytics {
   count: number;
 }
 
+export interface SubmissionTimelineMonth {
+  month: string;
+  count: number;
+}
+
+export interface SubmissionTimelineYear {
+  year: string;
+  months: SubmissionTimelineMonth[];
+}
+
 export interface RawInternship {
   id: string;
   companyName: string;
@@ -91,6 +101,7 @@ export interface FilteredData {
   modeAnalytics: ModeAnalytics;
   durationAnalytics: DurationAnalytics;
   yearAnalytics: YearAnalytics[];
+  submissionTimelineByYear: SubmissionTimelineYear[];
   locationDistribution: Array<{ location: string; count: number }>;
   domainDistribution: Array<{ domain: string; count: number }>;
   domainTrends: DomainTrend[];
