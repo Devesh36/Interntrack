@@ -248,44 +248,82 @@ export function AuditLogs({ forms }: AuditLogsProps) {
   );
 
   /*  CSV Export  */
-  const exportCSV = () => {
+  const exportCSV = async () => {
+    // If there are no logs at all in memory, avoid unnecessary work.
     if (logs.length === 0) return;
-    const headers = [
-      "Student Name",
-      "Student Email",
-      "Company",
-      "Action",
-      "IP Address",
-      "Location",
-      "User Agent",
-      "Timestamp",
-    ];
-    const rows = [headers.join(",")];
-    for (const row of logs) {
-      rows.push(
-        [
-          `"${row.attendance.student.name}"`,
-          `"${row.attendance.student.email}"`,
-          `"${row.attendance.internshipForm.companyName}"`,
-          `"${row.action}"`,
-          `"${row.ipAddress}"`,
-          `"${row.location ?? ""}"`,
-          `"${row.userAgent ?? ""}"`,
-          `"${new Date(row.timestamp).toISOString()}"`,
-        ].join(","),
-      );
+
+    // Helper to fall back to the existing client-side CSV generation
+    const exportFromCurrentPage = () => {
+      const headers = [
+        "Student Name",
+        "Student Email",
+        "Company",
+        "Action",
+        "IP Address",
+        "Location",
+        "User Agent",
+        "Timestamp",
+      ];
+      const rows = [headers.join(",")];
+      for (const row of logs) {
+        rows.push(
+          [
+            `"${row.attendance.student.name}"`,
+            `"${row.attendance.student.email}"`,
+            `"${row.attendance.internshipForm.companyName}"`,
+            `"${row.action}"`,
+            `"${row.ipAddress}"`,
+            `"${row.location ?? ""}"`,
+            `"${row.userAgent ?? ""}"`,
+            `"${new Date(row.timestamp).toISOString()}"`,
+          ].join(","),
+        );
+      }
+      const blob = new Blob([rows.join("\n")], {
+        type: "text/csv;charset=utf-8;",
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `interntrack-logs-${new Date().toISOString()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    };
+
+    try {
+      // Attempt to perform a full-server export that respects current URL filters.
+      const search = typeof window !== "undefined" ? window.location.search : "";
+      const response = await fetch(`/api/logs/export${search}`, {
+        method: "GET",
+      });
+
+      if (!response.ok) {
+        // If server-side export fails, fall back to current-page export.
+        exportFromCurrentPage();
+        return;
+      }
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `interntrack-logs-${new Date().toISOString()}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      // On any unexpected error, fall back to the existing behavior.
+      console.error("Failed to export logs via server, using current page only.", error);
+      try {
+        exportFromCurrentPage();
+      } catch (fallbackError) {
+        console.error("Failed to export logs from current page.", fallbackError);
+        toast.error("Failed to export logs.");
+      }
     }
-    const blob = new Blob([rows.join("\n")], {
-      type: "text/csv;charset=utf-8;",
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `interntrack-logs-${new Date().toISOString()}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   /*  Heatmap helpers  */
