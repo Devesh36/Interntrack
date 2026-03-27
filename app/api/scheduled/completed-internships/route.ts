@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+// force-dynamic: this route reads request.headers (auth token) so it can never be statically generated
+export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
   try {
     // Only allow Vercel Cron or dev environment

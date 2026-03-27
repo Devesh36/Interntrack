@@ -1,17 +1,73 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect } from "react";
 import { useAnalyticsData } from "./_lib/use-analytics-data";
 import { AnalyticsNavbar } from "./_components/analytics-navbar";
 import { AnalyticsHeader } from "./_components/analytics-header";
 import { FilterChips } from "./_components/filter-chips";
 import { MetricCards } from "./_components/metric-cards";
-import { DistributionCharts } from "./_components/distribution-charts";
-import { TrendsCharts } from "./_components/trends-charts";
-import { TopCompaniesTable } from "./_components/top-companies-table";
-import { CrossAnalysisChart } from "./_components/cross-analysis-chart";
-import { InsightsCharts } from "./_components/insights-charts";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+
+const DistributionCharts = dynamic(
+  () =>
+    import("./_components/distribution-charts").then(
+      (mod) => mod.DistributionCharts,
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[420px] rounded-[14px] bg-white border border-[#e8eaed]" />
+    ),
+  },
+);
+
+const TrendsCharts = dynamic(
+  () => import("./_components/trends-charts").then((mod) => mod.TrendsCharts),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[420px] rounded-[14px] bg-white border border-[#e8eaed]" />
+    ),
+  },
+);
+
+const TopCompaniesTable = dynamic(
+  () =>
+    import("./_components/top-companies-table").then(
+      (mod) => mod.TopCompaniesTable,
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[220px] rounded-[14px] bg-white border border-[#e8eaed]" />
+    ),
+  },
+);
+
+const CrossAnalysisChart = dynamic(
+  () =>
+    import("./_components/cross-analysis-chart").then(
+      (mod) => mod.CrossAnalysisChart,
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[320px] rounded-[14px] bg-white border border-[#e8eaed]" />
+    ),
+  },
+);
+
+const InsightsCharts = dynamic(
+  () =>
+    import("./_components/insights-charts").then((mod) => mod.InsightsCharts),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-[320px] rounded-[14px] bg-white border border-[#e8eaed]" />
+    ),
+  },
+);
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
   return (
@@ -103,7 +159,7 @@ export default function AnalyticsPage() {
             </section>
 
             {/* Insights: Location, Domain, Attendance */}
-            <section className="reveal delay-3 mt-8">
+            <section className="reveal mt-8">
               <SectionTitle>Insights</SectionTitle>
               <InsightsCharts filteredData={filteredData} />
             </section>

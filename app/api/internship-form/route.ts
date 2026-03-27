@@ -219,7 +219,7 @@ export async function GET(request: NextRequest) {
       forms = await prisma.internshipForm.findMany({
         where: { teacherId: user.id },
         include: {
-          student: { select: { name: true, email: true } },
+          student: { select: { id: true, name: true, email: true } },
           attendances: {
             orderBy: { date: "desc" },
             take: 5,

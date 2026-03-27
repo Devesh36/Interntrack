@@ -18,6 +18,21 @@ import type {
 } from "./types";
 import { toast } from "sonner";
 
+const ACADEMIC_MONTHS = [
+  { label: "Jun", month: 5 },
+  { label: "Jul", month: 6 },
+  { label: "Aug", month: 7 },
+  { label: "Sep", month: 8 },
+  { label: "Oct", month: 9 },
+  { label: "Nov", month: 10 },
+  { label: "Dec", month: 11 },
+  { label: "Jan", month: 0 },
+  { label: "Feb", month: 1 },
+  { label: "Mar", month: 2 },
+  { label: "Apr", month: 3 },
+  { label: "May", month: 4 },
+] as const;
+
 function getAcademicYear(date: Date): string {
   const month = date.getMonth();
   const year = date.getFullYear();
@@ -256,6 +271,35 @@ export function useAnalyticsData() {
       .map(([year, count]) => ({ year, count }))
       .sort((a, b) => a.year.localeCompare(b.year));
 
+    const submissionTimelineMap = new Map<string, Map<string, number>>();
+    internships.forEach((i) => {
+      const date = new Date(i.startDate || i.createdAt);
+      const academicYear = getAcademicYear(date);
+      const monthLabel =
+        ACADEMIC_MONTHS.find((month) => month.month === date.getMonth())
+          ?.label || "Unknown";
+
+      if (!submissionTimelineMap.has(academicYear)) {
+        submissionTimelineMap.set(
+          academicYear,
+          new Map(ACADEMIC_MONTHS.map((month) => [month.label, 0])),
+        );
+      }
+
+      const months = submissionTimelineMap.get(academicYear)!;
+      months.set(monthLabel, (months.get(monthLabel) || 0) + 1);
+    });
+
+    const submissionTimelineByYear = Array.from(submissionTimelineMap.entries())
+      .map(([year, months]) => ({
+        year,
+        months: ACADEMIC_MONTHS.map(({ label }) => ({
+          month: label,
+          count: months.get(label) || 0,
+        })),
+      }))
+      .sort((a, b) => a.year.localeCompare(b.year));
+
     // Branch-company chart
     const branchCompanyMap = new Map<
       string,
@@ -417,6 +461,7 @@ export function useAnalyticsData() {
       modeAnalytics,
       durationAnalytics,
       yearAnalytics,
+      submissionTimelineByYear,
       locationDistribution,
       domainDistribution,
       domainTrends,
