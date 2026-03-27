@@ -316,40 +316,12 @@ export function AuditLogs({ forms }: AuditLogsProps) {
     }));
   }
 
-  /*  Stat card data  */
-  const statCards = [
-    {
-      label: "Total Logs",
-      value: stats.total,
-      icon: <FileText className="w-5 h-5" />,
-      tone: "bg-[#eff4ff] text-[#2563eb]",
-    },
-    {
-      label: "Present",
-      value: stats.present,
-      icon: <CheckCircle className="w-5 h-5" />,
-      tone: "bg-[#f0fdf4] text-[#16a34a]",
-    },
-    {
-      label: "Absent",
-      value: stats.absent,
-      icon: <XCircle className="w-5 h-5" />,
-      tone: "bg-[#fef2f2] text-[#dc2626]",
-    },
-    {
-      label: "Students Tracked",
-      value: stats.students,
-      icon: <Users className="w-5 h-5" />,
-      tone: "bg-[#f5f3ff] text-[#7c3aed]",
-    },
-  ];
-
   return (
     <div className="space-y-5">
       {/*  Toolbar  */}
       <div
         className={cn(
-          "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between transition-all duration-[time:380ms] ease-out",
+          "flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between transition-all duration-300 ease-out",
           staggerRevealed[0]
             ? "opacity-100 translate-y-0"
             : "opacity-0 translate-y-3",

@@ -57,9 +57,18 @@ export async function GET(request: NextRequest) {
     }
 
     // Pagination
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const limit = parseInt(searchParams.get("limit") || "20", 10);
-    const skip = (page - 1) * limit;
+    const MAX_LIMIT = 100;
+    let page = parseInt(searchParams.get("page") || "1", 10);
+    if (Number.isNaN(page) || page < 1) {
+      page = 1;
+    }
+    let limit = parseInt(searchParams.get("limit") || "20", 10);
+    if (Number.isNaN(limit) || limit <= 0) {
+      limit = 20;
+    }
+    if (limit > MAX_LIMIT) {
+      limit = MAX_LIMIT;
+    }
 
     const [logs, totalCount] = await Promise.all([
       prisma.verificationLog.findMany({
@@ -73,7 +82,7 @@ export async function GET(request: NextRequest) {
           },
         },
         orderBy: { timestamp: "desc" },
-        skip,
+        skip: (page - 1) * limit,
         take: limit,
       }),
       prisma.verificationLog.count({ where: whereClause }),

@@ -196,8 +196,9 @@ function TeacherDashboardInner() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  // read directly
-  const canViewReports = process.env.NEXT_PUBLIC_ENABLE_REPORTS === "true";
+  const enableReportsEnv = process.env.NEXT_PUBLIC_ENABLE_REPORTS;
+  const canViewReports =
+    enableReportsEnv === undefined ? true : enableReportsEnv === "true";
 
   const fetchDashboardData = useCallback(async () => {
     try {
