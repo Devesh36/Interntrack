@@ -300,9 +300,10 @@ function TeacherDashboardInner() {
       countMap.set(key, (countMap.get(key) ?? 0) + 1);
     });
 
+    const now = new Date();
     const months = Array.from({ length: 5 }).map((_, i) => {
-      const d = new Date();
-      d.setMonth(d.getMonth() - (4 - i));
+      // Anchor to day 1 so month subtraction cannot overflow into the next month
+      const d = new Date(now.getFullYear(), now.getMonth() - (4 - i), 1);
       const key = `${d.getFullYear()}-${d.getMonth()}`;
       return { key, label: fmt.format(d), count: countMap.get(key) ?? 0 };
     });
