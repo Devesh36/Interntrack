@@ -20,11 +20,14 @@ export async function PATCH(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { status } = await request.json();
+    const { status, rejectionReason } = await request.json();
 
     if (!["APPROVED", "REJECTED"].includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
+
+    const normalizedRejectionReason =
+      typeof rejectionReason === "string" ? rejectionReason.trim() : "";
 
     const form = await prisma.internshipForm.findUnique({
       where: { id: params.id },
@@ -62,6 +65,7 @@ export async function PATCH(
           data: {
             status: "APPROVED",
             isActive: shouldBeActive,
+            rejectionReason: null,
           },
           include: {
             student: { select: { name: true, email: true } },
@@ -70,11 +74,22 @@ export async function PATCH(
         });
       });
     } else {
+      if (
+        !normalizedRejectionReason ||
+        normalizedRejectionReason.length === 0
+      ) {
+        return NextResponse.json(
+          { error: "Rejection reason is required" },
+          { status: 400 },
+        );
+      }
+
       updatedForm = await prisma.internshipForm.update({
         where: { id: params.id },
         data: {
           status: "REJECTED",
           isActive: false,
+          rejectionReason: normalizedRejectionReason,
         },
         include: {
           student: { select: { name: true, email: true } },

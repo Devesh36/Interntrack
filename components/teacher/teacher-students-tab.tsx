@@ -31,6 +31,7 @@ type StudentForm = {
   studentClass?: string | null;
   studentBranch?: string | null;
   studentDivision?: string | null;
+  rejectionReason?: string | null;
   status: string;
   isActive: boolean;
   createdAt: string;
@@ -419,6 +420,18 @@ export function TeacherStudentsTab({ forms }: TeacherStudentsTabProps) {
                         </span>
                       ))}
                     </div>
+
+                    {form.status === "REJECTED" &&
+                    form.rejectionReason?.trim() ? (
+                      <div className="mt-3 rounded-[10px] border border-[#fecaca] bg-[#fef2f2] px-3 py-2">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[#b91c1c]">
+                          Rejection reason
+                        </p>
+                        <p className="mt-1 text-sm text-[#7f1d1d]">
+                          {form.rejectionReason.trim()}
+                        </p>
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className="flex flex-col items-start gap-2 md:items-end">

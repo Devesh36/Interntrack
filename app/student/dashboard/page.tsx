@@ -69,6 +69,7 @@ interface InternshipFormData {
   offerLetterURL?: string;
   deptCoordinatorEmail?: string;
   hrEmail?: string;
+  rejectionReason?: string | null;
   status: string;
   createdAt: string;
   teacher: { name: string; email: string };
@@ -1201,6 +1202,18 @@ export default function StudentDashboard() {
                               </div>
                             )}
                           </div>
+
+                          {form.status === "REJECTED" ? (
+                            <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3">
+                              <p className="text-sm font-semibold text-red-700">
+                                Rejection reason
+                              </p>
+                              <p className="mt-1 text-sm text-red-800">
+                                {form.rejectionReason?.trim() ||
+                                  "No rejection reason was saved for this form."}
+                              </p>
+                            </div>
+                          ) : null}
 
                           <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">

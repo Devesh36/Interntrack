@@ -6,6 +6,14 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -15,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { Textarea } from "@/components/ui/textarea";
 import {
   CheckCircle2,
   ChevronRight,
@@ -52,6 +61,7 @@ interface ApprovalFormData {
   studentClass?: string | null;
   studentBranch?: string | null;
   studentDivision?: string | null;
+  rejectionReason?: string | null;
   status: string;
   createdAt: string;
   student?: { id?: string; name?: string | null; email?: string | null } | null;
@@ -298,6 +308,11 @@ export function TeacherApprovalsTab({
   forms, // all pending forms, unfiltered
   onStatusChange,
 }: TeacherApprovalsTabProps) {
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
+  const [rejectingForm, setRejectingForm] = useState<ApprovalFormData | null>(
+    null,
+  );
+  const [rejectionReason, setRejectionReason] = useState("");
   const [loadingFormId, setLoadingFormId] = useState<string | null>(null);
   const [loadingAction, setLoadingAction] = useState<
     "APPROVED" | "REJECTED" | null
@@ -386,9 +401,12 @@ export function TeacherApprovalsTab({
     approvalDivision !== "ALL" ||
     approvalMode !== "ALL";
 
+  const normalizedRejectionReason = rejectionReason.trim();
+
   const handleStatusChange = async (
     formId: string,
     status: "APPROVED" | "REJECTED",
+    rejectionReasonValue?: string,
   ) => {
     setLoadingFormId(formId);
     setLoadingAction(status);
@@ -397,7 +415,12 @@ export function TeacherApprovalsTab({
       const response = await fetch(`/api/internship-form/${formId}/approve`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
+        body: JSON.stringify({
+          status,
+          ...(status === "REJECTED"
+            ? { rejectionReason: rejectionReasonValue }
+            : {}),
+        }),
       });
 
       if (!response.ok) {
@@ -411,20 +434,57 @@ export function TeacherApprovalsTab({
           : "Internship form rejected successfully.",
       );
       await onStatusChange();
+      return true;
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
           : "A network error occurred. Please try again.";
       toast.error(message);
+      return false;
     } finally {
       setLoadingFormId(null);
       setLoadingAction(null);
     }
   };
 
+  const openRejectDialog = (form: ApprovalFormData) => {
+    setRejectingForm(form);
+    setRejectionReason("");
+    setRejectDialogOpen(true);
+  };
+
+  const closeRejectDialog = (open: boolean) => {
+    if (loadingAction === "REJECTED") return;
+    setRejectDialogOpen(open);
+
+    if (!open) {
+      setRejectingForm(null);
+      setRejectionReason("");
+    }
+  };
+
+  const submitRejection = async () => {
+    if (!rejectingForm) return;
+    if (!normalizedRejectionReason) {
+      toast.error("Please enter a rejection reason.");
+      return;
+    }
+
+    const success = await handleStatusChange(
+      rejectingForm.id,
+      "REJECTED",
+      normalizedRejectionReason,
+    );
+
+    if (success) {
+      closeRejectDialog(false);
+    }
+  };
+
   return (
-    <div className="space-y-6">
+    <>
+      <div className="space-y-6">
       <div className="space-y-4">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
@@ -812,7 +872,7 @@ export function TeacherApprovalsTab({
                     </Button>
                     <Button
                       type="button"
-                      onClick={() => handleStatusChange(form.id, "REJECTED")}
+                      onClick={() => openRejectDialog(form)}
                       disabled={isLoading}
                       variant="outline"
                       className="h-12 rounded-xl gap-2 border-[#f8d7da] bg-white px-4 text-sm font-semibold text-[#c2414c] shadow-none transition-colors duration-200 hover:border-[#ef9aa3] hover:bg-[#fff7f8] hover:text-[#b42318]"
@@ -903,6 +963,62 @@ export function TeacherApprovalsTab({
           ) : null}
         </div>
       )}
-    </div>
+      </div>
+
+      <Dialog open={rejectDialogOpen} onOpenChange={closeRejectDialog}>
+        <DialogContent className="sm:max-w-[560px]">
+          <DialogHeader>
+            <DialogTitle>Reject internship form</DialogTitle>
+            <DialogDescription>
+              {rejectingForm
+                ? `Share a clear reason with ${formatStudentName(rejectingForm)} for ${rejectingForm.companyName}.`
+                : "Share a clear reason for this rejection."}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-[#111318]">
+              Rejection reason
+            </p>
+            <Textarea
+              value={rejectionReason}
+              onChange={(event) => setRejectionReason(event.target.value)}
+              placeholder="Explain what needs to be corrected before the student submits again."
+              className="min-h-[132px] resize-y"
+              maxLength={500}
+            />
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-gray-500">
+                This message will be shown to the student in their dashboard.
+              </span>
+              <span className="text-gray-400">
+                {rejectionReason.length}/500
+              </span>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => closeRejectDialog(false)}
+              disabled={loadingAction === "REJECTED"}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              onClick={submitRejection}
+              disabled={
+                loadingAction === "REJECTED" || !normalizedRejectionReason
+              }
+              className="bg-[#b42318] text-white hover:bg-[#912018]"
+            >
+              {loadingAction === "REJECTED" ? "Rejecting..." : "Confirm rejection"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
