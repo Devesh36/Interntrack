@@ -95,10 +95,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!result) {
-      return NextResponse.json(
-        { error: INVALID_TOKEN_ERROR },
-        { status: 400 },
-      );
+      return NextResponse.json({ error: INVALID_TOKEN_ERROR }, { status: 400 });
     }
 
     const redirectTo =
