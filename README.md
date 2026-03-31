@@ -1,236 +1,268 @@
-# Internship Attendance Verification System
+# Interntrack
 
-A comprehensive full-stack web application for managing student internships with email-based attendance verification, built with Next.js, PostgreSQL, and Prisma.
+Interntrack is a full-stack internship management platform for colleges. It lets students submit internship details, enables teachers to review and approve them, tracks daily attendance through HR email verification, and keeps an audit trail of verification activity.
 
-## 🚀 Features
+The current app is built with Next.js App Router, Prisma, PostgreSQL, JWT cookie auth, Tailwind CSS, and shadcn/ui.
 
-### 🧑‍🎓 Student Portal
-- Secure login with role-based authentication
-- Submit internship forms with company details
-- Upload offer letters (via URL)
-- Request daily attendance verification
-- Track attendance history
+## What It Does
 
-### 🧑‍🏫 Teacher Portal
-- Review and approve/reject internship applications
-- Monitor student attendance patterns
-- Access comprehensive audit logs
-- View IP addresses, locations, and timestamps
+### Student experience
+- Sign up and log in as a student
+- Submit an internship form with company, duration, stipend, mode, offer letter URL, HR email, and department coordinator email
+- View approval status, rejection reasons, and internship history
+- Request daily attendance verification for the active internship
+- Track attendance through calendar and heatmap style views
 
-### 👨‍💼 HR Verification (No Login Required)
-- Receive email notifications for attendance verification
-- One-click Present/Absent buttons
-- Secure JWT token-based verification
-- Automatic attendance recording
+### Teacher experience
+- Sign up and log in as a teacher
+- Review pending internship forms
+- Approve or reject submissions with a required rejection reason
+- View student and attendance activity from the dashboard
+- Manage department coordinators by branch
+- Review audit logs for attendance verification events
+- Access analytics dashboards for placements, companies, stipend trends, attendance rate, and exports
+- Send or receive periodic attendance report emails
 
-## 🛠️ Tech Stack
+### HR verification flow
+- No login is required for HR
+- A student requests attendance for the active internship
+- Interntrack emails HR a verification link with `present` and `absent` actions
+- The link updates attendance status and stores verification metadata such as IP address and user agent
 
-- **Frontend & Backend**: Next.js 13+ (App Router)
-- **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: JWT tokens with role-based access
-- **Email**: SendGrid/SMTP integration (placeholder)
-- **Styling**: Tailwind CSS with shadcn/ui components
-- **Security**: JWT tokens, IP tracking, location logging
+## Tech Stack
 
-## 📦 Installation
+- Next.js 13.5 App Router
+- React 18
+- TypeScript
+- Prisma ORM
+- PostgreSQL
+- JWT authentication via cookies
+- Nodemailer for SMTP email delivery
+- Tailwind CSS + shadcn/ui
+- Recharts for analytics visualizations
 
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd internship-attendance-system
-   ```
+## Core Data Model
 
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
+The main Prisma models are:
 
-3. **Set up environment variables**
-   ```bash
-   cp .env.example .env
-   ```
-   Fill in your database URL, JWT secret, and email service configuration.
+- `User`: students and teachers
+- `InternshipForm`: internship application and approval state
+- `Attendance`: one attendance request per day per internship
+- `VerificationLog`: audit log for HR verification actions
+- `DepartmentCoordinator`: branch-wise coordinator directory
 
-4. **Set up the database**
-   ```bash
-   npx prisma generate
-   npx prisma migrate dev
-   ```
+Current internship statuses:
 
-5. **Seed the database (optional)**
-   ```bash
-   npx prisma db seed
-   ```
+- `PENDING`
+- `APPROVED`
+- `COMPLETED`
+- `REJECTED`
 
-6. **Start the development server**
-   ```bash
-   npm run dev
-   ```
+Current attendance statuses:
 
-## 🗄️ Database Schema
+- `PENDING`
+- `VERIFIED`
+- `ABSENT`
 
-### User
-- `id` - Unique identifier
-- `name` - Full name
-- `email` - Email address (unique)
-- `password` - Hashed password
-- `role` - STUDENT or TEACHER
+## Project Structure
 
-### InternshipForm
-- `id` - Unique identifier
-- `studentId` - Foreign key to User
-- `teacherId` - Foreign key to User
-- `companyName` - Company name
-- `offerLetterURL` - URL to offer letter
-- `supervisorEmail` - Supervisor's email
-- `hrEmail` - HR contact email
-- `status` - PENDING, APPROVED, or REJECTED
-
-### Attendance
-- `id` - Unique identifier
-- `studentId` - Foreign key to User
-- `internshipFormId` - Foreign key to InternshipForm
-- `date` - Date of attendance
-- `status` - PENDING, VERIFIED, or ABSENT
-- `verificationToken` - JWT token for email verification
-
-### VerificationLog
-- `id` - Unique identifier
-- `attendanceId` - Foreign key to Attendance
-- `ipAddress` - IP address of verifier
-- `location` - Geolocation (from IP)
-- `userAgent` - Browser information
-- `action` - present or absent
-- `timestamp` - When verification occurred
-
-## 🔄 User Flows
-
-### Student Flow
-1. Login at `/student/login`
-2. Submit internship form with:
-   - Academic teacher selection
-   - Company details
-   - Offer letter URL
-   - HR email
-3. Wait for teacher approval
-4. Click "I'm at the Company" to request verification
-5. System sends email to HR with Present/Absent buttons
-
-### Teacher Flow
-1. Login at `/teacher/login`
-2. Review pending internship forms
-3. Approve or reject applications
-4. Monitor student attendance
-5. View audit logs with IP and location data
-
-### HR Flow (No Login)
-1. Receive email with verification request
-2. Click "Present" or "Absent" button
-3. System validates JWT token
-4. Attendance is automatically recorded
-5. Verification is logged with metadata
-
-## 🔒 Security Features
-
-- **JWT Authentication**: Secure token-based authentication
-- **Role-based Access**: Separate portals for students and teachers
-- **IP Tracking**: Log IP addresses for all verifications
-- **Location Logging**: Track geographic location from IP
-- **Token Expiration**: JWT tokens expire after 7 days
-- **Input Validation**: Comprehensive validation on all forms
-
-## 📧 Email Integration
-
-The system includes placeholder integration for email services:
-
-### SendGrid Integration
-```javascript
-// In production, uncomment and configure:
-const sgMail = require('@sendgrid/mail')
-sgMail.setApiKey(process.env.SENDGRID_API_KEY)
-await sgMail.send({ to, from, subject, html })
+```text
+app/
+  api/                  API routes for auth, forms, attendance, analytics, cron jobs
+  student/              Student auth and dashboard pages
+  teacher/              Teacher auth, dashboard, and analytics pages
+components/
+  student/              Student dashboard and form UI
+  teacher/              Teacher dashboard, logs, coordinator management UI
+  ui/                   Shared shadcn/ui components
+lib/
+  auth.ts               JWT, password hashing, auth helpers
+  email.ts              Attendance and report email helpers
+  prisma.ts             Prisma client singleton
+prisma/
+  schema.prisma         Database schema
+  migrations/           Prisma migrations
+middleware.ts           Route protection for dashboard pages
+vercel.json             Vercel cron configuration
 ```
 
-### SMTP Integration
-```javascript
-// Or configure SMTP settings in .env:
-SMTP_HOST="smtp.gmail.com"
-SMTP_PORT=587
-SMTP_USER="your-email@gmail.com"
-SMTP_PASS="your-app-password"
-```
+## Getting Started
 
-## 🔧 API Routes
+### 1. Install dependencies
 
-### Authentication
-- `POST /api/auth/login/student` - Student login
-- `POST /api/auth/login/teacher` - Teacher login
-- `POST /api/auth/logout` - Logout
+`pnpm` is the preferred package manager in this repo.
 
-### Internship Management
-- `POST /api/internship-form` - Create internship form
-- `GET /api/internship-form` - Get user's forms
-- `PATCH /api/internship-form/[id]/approve` - Approve/reject form
-
-### Attendance
-- `POST /api/attendance/request` - Request attendance verification
-- `GET /api/attendance/verify` - Verify attendance (from email)
-
-### Data Access
-- `GET /api/users/teachers` - Get list of teachers
-- `GET /api/logs` - Get verification logs
-
-## 🚀 Deployment
-
-1. **Build the application**
-   ```bash
-   npm run build
-   ```
-
-2. **Set up production database**
-   - Configure PostgreSQL instance
-   - Update DATABASE_URL in production environment
-
-3. **Configure email service**
-   - Set up SendGrid or SMTP credentials
-   - Update email service configuration
-
-4. **Deploy to your preferred platform**
-   - Vercel, Netlify, or any Node.js hosting service
-   - Ensure environment variables are configured
-
-## 🧪 Development
-
-### Running Tests
 ```bash
-npm test
+pnpm install
 ```
 
-### Database Operations
+If you use `npm`, keep to `npm` consistently for install and scripts.
+
+### 2. Create environment variables
+
+There is currently no committed `.env.example`, so create `.env` manually.
+
 ```bash
-# Generate Prisma client
-npx prisma generate
-
-# Create and run migrations
-npx prisma migrate dev
-
-# View database in Prisma Studio
-npx prisma studio
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DB_NAME?schema=public"
+JWT_SECRET="replace-with-a-long-random-secret"
+SMTP_HOST="smtp.example.com"
+SMTP_PORT="587"
+SMTP_USER="user@example.com"
+SMTP_PASS="password"
+NEXT_PUBLIC_BASE_URL="http://localhost:3000"
+CRON_SECRET="replace-with-a-random-secret"
+NEXT_PUBLIC_ENABLE_REPORTS="true"
 ```
 
-## 📝 License
+### 3. Run database migrations
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+```bash
+pnpm prisma generate
+pnpm prisma migrate dev
+```
 
-## 🤝 Contributing
+### 4. Start the app
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+```bash
+pnpm dev
+```
 
-## 📞 Support
+Open:
 
-For support, please open an issue in the GitHub repository or contact the development team.# Interntrack
-# Interntrack_2.0
+- `http://localhost:3000`
+- Student login: `http://localhost:3000/student/login`
+- Teacher login: `http://localhost:3000/teacher/login`
+
+## Environment Variables
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `DATABASE_URL` | Yes | PostgreSQL connection used by Prisma |
+| `JWT_SECRET` | Yes | Signs and verifies auth and attendance tokens |
+| `SMTP_HOST` | Recommended | SMTP host for attendance and report emails |
+| `SMTP_PORT` | Recommended | SMTP port |
+| `SMTP_USER` | Recommended | SMTP username |
+| `SMTP_PASS` | Recommended | SMTP password |
+| `NEXT_PUBLIC_BASE_URL` | Recommended | Base URL used in attendance verification links |
+| `CRON_SECRET` | Required in production | Protects scheduled job endpoints |
+| `NEXT_PUBLIC_ENABLE_REPORTS` | Optional | Toggles teacher report visibility in the dashboard |
+
+## Development Notes
+
+### Development shortcut login
+
+In `development`, both login routes accept:
+
+- Email: `admin`
+- Password: `admin123`
+
+That shortcut works for:
+
+- `/api/auth/login/student` as a temporary student user
+- `/api/auth/login/teacher` as a temporary teacher user
+
+### Email behavior
+
+Attendance requests create an attendance record and then send an HR verification email. If SMTP variables are missing, email delivery is skipped and the request will fail.
+
+### Location logging
+
+IP capture is implemented, but the geolocation helper is still a placeholder. Verification logs currently store derived values like `Location for <ip>` unless you wire in a real lookup provider in [`lib/utils/ip.ts`](/home/rushabh/Dev/Interntrack/lib/utils/ip.ts).
+
+## Scheduled Jobs
+
+`vercel.json` currently defines three cron jobs:
+
+- `/api/scheduled/attendanceReports` at `30 3 1,16 * *`
+- `/api/scheduled/completed-internships` at `0 2 */2 * *`
+- `/api/scheduled/active-internships` at `0 2 */2 * *`
+
+What they do:
+
+- `attendanceReports`: emails a CSV report of the last 15 days of verification activity to all teachers
+- `completed-internships`: marks expired active internships as `COMPLETED`
+- `active-internships`: activates approved internships whose date range has started
+
+In production, these routes expect `Authorization: Bearer <CRON_SECRET>` or the matching cron secret header where implemented.
+
+## Main Routes
+
+### Pages
+
+- `/`
+- `/student/signup`
+- `/student/login`
+- `/student/dashboard`
+- `/teacher/signup`
+- `/teacher/login`
+- `/teacher/dashboard`
+- `/teacher/analytics`
+
+### API
+
+Authentication:
+
+- `POST /api/auth/signup`
+- `POST /api/auth/login/student`
+- `POST /api/auth/login/teacher`
+- `POST /api/auth/logout`
+- `GET /api/auth/me`
+
+Internships and attendance:
+
+- `POST /api/internship-form`
+- `GET /api/internship-form`
+- `PATCH /api/internship-form/[id]/approve`
+- `POST /api/attendance/request`
+- `GET /api/attendance/verify`
+
+Teacher/admin data:
+
+- `GET /api/users/teachers`
+- `GET /api/logs`
+- `GET /api/analytics`
+- `GET /api/dept-coordinator`
+- `POST /api/dept-coordinator`
+- `PUT /api/dept-coordinator/[id]`
+- `DELETE /api/dept-coordinator/[id]`
+
+Scheduled:
+
+- `GET /api/scheduled/attendanceReports`
+- `POST /api/scheduled/attendanceReports`
+- `GET /api/scheduled/completed-internships`
+- `GET /api/scheduled/active-internships`
+
+## Available Scripts
+
+```bash
+pnpm dev
+pnpm build
+pnpm start
+pnpm lint
+```
+
+Notes:
+
+- `pnpm build` runs `prisma generate` before the Next.js build
+- There is no automated test script configured in `package.json` right now
+
+## Deployment
+
+This app is set up well for Vercel-style deployment with a managed PostgreSQL database.
+
+Before deploying:
+
+1. Provision PostgreSQL and set `DATABASE_URL`
+2. Set `JWT_SECRET`
+3. Configure SMTP credentials if you want attendance and report emails to work
+4. Set `NEXT_PUBLIC_BASE_URL` to the deployed site URL
+5. Set `CRON_SECRET` so scheduled routes are protected
+6. Run Prisma migrations against the production database
+
+## Current Limitations
+
+- No `.env.example` file is committed yet
+- IP geolocation is still a placeholder integration
+- Middleware currently protects dashboard routes, not every teacher page
+- The repository contains both `pnpm-lock.yaml` and `package-lock.json`; use one package manager consistently in local development
