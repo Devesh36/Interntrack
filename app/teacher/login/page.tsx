@@ -100,6 +100,14 @@ export default function TeacherLogin() {
                     required
                   />
                 </div>
+                <div className="text-right">
+                  <Link
+                    href="/forgot-password"
+                    className="text-sm text-emerald-600 hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
               </div>
 
               <Button
