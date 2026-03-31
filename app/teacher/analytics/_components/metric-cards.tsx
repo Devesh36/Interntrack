@@ -52,10 +52,7 @@ const metrics = [
   },
 ];
 
-export function MetricCards({
-  filteredData,
-  paidPercent,
-}: MetricCardsProps) {
+export function MetricCards({ filteredData, paidPercent }: MetricCardsProps) {
   const topRecruiter =
     filteredData.topCompanies[0] && filteredData.topCompanies[0].count > 1
       ? filteredData.topCompanies[0].company

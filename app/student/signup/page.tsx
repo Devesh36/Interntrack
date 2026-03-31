@@ -1,5 +1,5 @@
-import SignupForm from '@/components/auth/SignupForm'
+import SignupForm from "@/components/auth/SignupForm";
 
 export default function StudentSignupPage() {
-  return <SignupForm role="STUDENT" />
+  return <SignupForm role="STUDENT" />;
 }
