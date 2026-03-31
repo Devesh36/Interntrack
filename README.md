@@ -7,6 +7,7 @@ The current app is built with Next.js App Router, Prisma, PostgreSQL, JWT cookie
 ## What It Does
 
 ### Student experience
+
 - Sign up and log in as a student
 - Submit an internship form with company, duration, stipend, mode, offer letter URL, HR email, and department coordinator email
 - View approval status, rejection reasons, and internship history
@@ -14,6 +15,7 @@ The current app is built with Next.js App Router, Prisma, PostgreSQL, JWT cookie
 - Track attendance through calendar and heatmap style views
 
 ### Teacher experience
+
 - Sign up and log in as a teacher
 - Review pending internship forms
 - Approve or reject submissions with a required rejection reason
@@ -24,6 +26,7 @@ The current app is built with Next.js App Router, Prisma, PostgreSQL, JWT cookie
 - Send or receive periodic attendance report emails
 
 ### HR verification flow
+
 - No login is required for HR
 - A student requests attendance for the active internship
 - Interntrack emails HR a verification link with `present` and `absent` actions
@@ -203,17 +206,17 @@ Open:
 
 ## Environment Variables
 
-| Variable | Required | Purpose |
-| --- | --- | --- |
-| `DATABASE_URL` | Yes | PostgreSQL connection used by Prisma |
-| `JWT_SECRET` | Yes | Signs and verifies auth and attendance tokens |
-| `SMTP_HOST` | Recommended | SMTP host for attendance and report emails |
-| `SMTP_PORT` | Recommended | SMTP port |
-| `SMTP_USER` | Recommended | SMTP username |
-| `SMTP_PASS` | Recommended | SMTP password |
-| `NEXT_PUBLIC_BASE_URL` | Recommended | Base URL used in attendance verification links |
-| `CRON_SECRET` | Required in production | Protects scheduled job endpoints |
-| `NEXT_PUBLIC_ENABLE_REPORTS` | Optional | Toggles teacher report visibility in the dashboard |
+| Variable                     | Required               | Purpose                                            |
+| ---------------------------- | ---------------------- | -------------------------------------------------- |
+| `DATABASE_URL`               | Yes                    | PostgreSQL connection used by Prisma               |
+| `JWT_SECRET`                 | Yes                    | Signs and verifies auth and attendance tokens      |
+| `SMTP_HOST`                  | Recommended            | SMTP host for attendance and report emails         |
+| `SMTP_PORT`                  | Recommended            | SMTP port                                          |
+| `SMTP_USER`                  | Recommended            | SMTP username                                      |
+| `SMTP_PASS`                  | Recommended            | SMTP password                                      |
+| `NEXT_PUBLIC_BASE_URL`       | Recommended            | Base URL used in attendance verification links     |
+| `CRON_SECRET`                | Required in production | Protects scheduled job endpoints                   |
+| `NEXT_PUBLIC_ENABLE_REPORTS` | Optional               | Toggles teacher report visibility in the dashboard |
 
 ## Development Notes
 
