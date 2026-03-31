@@ -29,6 +29,82 @@ The current app is built with Next.js App Router, Prisma, PostgreSQL, JWT cookie
 - Interntrack emails HR a verification link with `present` and `absent` actions
 - The link updates attendance status and stores verification metadata such as IP address and user agent
 
+## Data Flow Diagrams
+
+### High-Level DFD
+
+```mermaid
+flowchart LR
+    student[Student]
+    teacher[Teacher]
+    hr[HR]
+    system((Interntrack))
+    db[(Database)]
+    mail[Email Service]
+
+    student -->|Forms and attendance requests| system
+    teacher -->|Approvals, logs, analytics| system
+    hr -->|Attendance verification| system
+    system -->|Dashboard responses| student
+    system -->|Dashboard responses| teacher
+    system -->|Verification result| hr
+    system <--> db
+    system -->|Attendance and report emails| mail
+    mail --> hr
+    mail --> teacher
+```
+
+### Low-Level DFD
+
+```mermaid
+flowchart TB
+    student[Student]
+    teacher[Teacher]
+    hr[HR]
+    p1((1.0 Auth))
+    p2((2.0 Internship Form Processing))
+    p3((3.0 Attendance Request))
+    p4((4.0 HR Verification))
+    p5((5.0 Logs and Analytics))
+
+    d1[(D1 Users)]
+    d2[(D2 Internship Forms)]
+    d3[(D3 Attendance)]
+    d4[(D4 Verification Logs)]
+    mail[Email Service]
+
+    student -->|Sign up / log in| p1
+    teacher -->|Sign up / log in| p1
+    p1 <--> d1
+
+    student -->|Submit internship form| p2
+    teacher -->|Approve / reject form| p2
+    p2 <--> d2
+    p2 -->|Assigned teacher data| d1
+
+    student -->|Request attendance| p3
+    p3 -->|Check active internship| d2
+    p3 <--> d3
+    p3 -->|Send verification email| mail
+    mail -->|Verification link| hr
+
+    hr -->|Present / absent response| p4
+    p4 -->|Validate attendance token| d3
+    p4 -->|Update status| d3
+    p4 -->|Store audit entry| d4
+
+    teacher -->|View logs / analytics| p5
+    student -->|View attendance history| p5
+    p5 --> d2
+    p5 --> d3
+    p5 --> d4
+```
+
+At a glance:
+
+- The high-level DFD shows the main users, the app, the database, and email delivery.
+- The low-level DFD shows the main internal processes, data stores, and how attendance verification moves through the system.
+
 ## Tech Stack
 
 - Next.js 13.5 App Router
