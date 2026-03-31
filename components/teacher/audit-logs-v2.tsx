@@ -294,7 +294,8 @@ export function AuditLogs({ forms }: AuditLogsProps) {
 
     try {
       // Attempt to perform a full-server export that respects current URL filters.
-      const search = typeof window !== "undefined" ? window.location.search : "";
+      const search =
+        typeof window !== "undefined" ? window.location.search : "";
       const response = await fetch(`/api/logs/export${search}`, {
         method: "GET",
       });
@@ -316,11 +317,17 @@ export function AuditLogs({ forms }: AuditLogsProps) {
       URL.revokeObjectURL(url);
     } catch (error) {
       // On any unexpected error, fall back to the existing behavior.
-      console.error("Failed to export logs via server, using current page only.", error);
+      console.error(
+        "Failed to export logs via server, using current page only.",
+        error,
+      );
       try {
         exportFromCurrentPage();
       } catch (fallbackError) {
-        console.error("Failed to export logs from current page.", fallbackError);
+        console.error(
+          "Failed to export logs from current page.",
+          fallbackError,
+        );
         toast.error("Failed to export logs.");
       }
     }

@@ -48,7 +48,8 @@ export function TrendsCharts({ filteredData }: TrendsChartsProps) {
   const hasYearData = filteredData.yearAnalytics.length > 0;
   const hasDurationData = durationBarData.some((item) => item.count > 0);
   const hasDomainTrendData =
-    filteredData.domainTrends.length > 0 && filteredData.domainTrendKeys.length > 0;
+    filteredData.domainTrends.length > 0 &&
+    filteredData.domainTrendKeys.length > 0;
 
   return (
     <div className="space-y-3">
@@ -74,7 +75,11 @@ export function TrendsCharts({ filteredData }: TrendsChartsProps) {
                         stopColor={COLORS.blue}
                         stopOpacity={0.15}
                       />
-                      <stop offset="95%" stopColor={COLORS.blue} stopOpacity={0} />
+                      <stop
+                        offset="95%"
+                        stopColor={COLORS.blue}
+                        stopOpacity={0}
+                      />
                     </linearGradient>
                   </defs>
                   <XAxis
@@ -182,12 +187,16 @@ export function TrendsCharts({ filteredData }: TrendsChartsProps) {
                     >
                       <stop
                         offset="5%"
-                        stopColor={domainTrendColors[i % domainTrendColors.length]}
+                        stopColor={
+                          domainTrendColors[i % domainTrendColors.length]
+                        }
                         stopOpacity={0.12}
                       />
                       <stop
                         offset="95%"
-                        stopColor={domainTrendColors[i % domainTrendColors.length]}
+                        stopColor={
+                          domainTrendColors[i % domainTrendColors.length]
+                        }
                         stopOpacity={0}
                       />
                     </linearGradient>

@@ -427,7 +427,10 @@ export function InternshipForm({ onSubmit, onBack }: InternshipFormProps) {
                     placeholder="e.g., Web Development, Data Science"
                     value={formData.domain}
                     onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, domain: e.target.value }))
+                      setFormData((prev) => ({
+                        ...prev,
+                        domain: e.target.value,
+                      }))
                     }
                     required
                   />
@@ -479,7 +482,8 @@ export function InternshipForm({ onSubmit, onBack }: InternshipFormProps) {
                       setFormData((prev) => ({
                         ...prev,
                         stipend: value,
-                        stipendAmount: value === "paid" ? prev.stipendAmount : "",
+                        stipendAmount:
+                          value === "paid" ? prev.stipendAmount : "",
                       }))
                     }
                     required
@@ -555,7 +559,8 @@ export function InternshipForm({ onSubmit, onBack }: InternshipFormProps) {
                   Documents & Contacts
                 </h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  Add the offer letter link and the contacts used for approval and attendance.
+                  Add the offer letter link and the contacts used for approval
+                  and attendance.
                 </p>
               </div>
               <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
@@ -579,7 +584,8 @@ export function InternshipForm({ onSubmit, onBack }: InternshipFormProps) {
                     />
                   </div>
                   <p className="text-sm text-gray-500">
-                    Upload your offer letter to Google Drive and paste the shareable link.
+                    Upload your offer letter to Google Drive and paste the
+                    shareable link.
                   </p>
                 </div>
 
@@ -606,7 +612,10 @@ export function InternshipForm({ onSubmit, onBack }: InternshipFormProps) {
                     placeholder="hr@company.com"
                     value={formData.hrEmail}
                     onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, hrEmail: e.target.value }))
+                      setFormData((prev) => ({
+                        ...prev,
+                        hrEmail: e.target.value,
+                      }))
                     }
                     required
                   />
@@ -622,7 +631,11 @@ export function InternshipForm({ onSubmit, onBack }: InternshipFormProps) {
             <Button type="button" variant="outline" onClick={onBack}>
               Cancel
             </Button>
-            <Button type="submit" className="sm:min-w-[180px]" disabled={loading}>
+            <Button
+              type="submit"
+              className="sm:min-w-[180px]"
+              disabled={loading}
+            >
               {loading ? (
                 <>
                   <LoadingSpinner className="w-4 h-4 mr-2" />

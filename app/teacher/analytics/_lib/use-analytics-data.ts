@@ -197,7 +197,9 @@ export function useAnalyticsData() {
 
     const stipendAmounts = internships
       .map((i) => i.stipendAmount)
-      .filter((amount): amount is number => amount !== null && amount !== undefined);
+      .filter(
+        (amount): amount is number => amount !== null && amount !== undefined,
+      );
     const stipendAmountRanges = [
       { range: "Below 5k", min: 0, max: 4999 },
       { range: "5k-10k", min: 5000, max: 10000 },
@@ -219,9 +221,8 @@ export function useAnalyticsData() {
       count: stipendAmounts.length,
       distribution: stipendAmountRanges.map(({ range, min, max }) => ({
         range,
-        count: stipendAmounts.filter(
-          (amount) => amount >= min && amount <= max,
-        ).length,
+        count: stipendAmounts.filter((amount) => amount >= min && amount <= max)
+          .length,
       })),
     };
 
@@ -303,7 +304,10 @@ export function useAnalyticsData() {
     // Branch-company chart
     const branchCompanyMap = new Map<
       string,
-      { label: string; companies: Map<string, { label: string; count: number }> }
+      {
+        label: string;
+        companies: Map<string, { label: string; count: number }>;
+      }
     >();
     internships.forEach((i) => {
       const branchValue = i.studentBranch || i.student.branch;
@@ -387,7 +391,10 @@ export function useAnalyticsData() {
         });
       }
       const domainEntry = domainMap.get(domainKey)!;
-      domainEntry.label = getPreferredAnalyticsLabel(domainEntry.label, i.domain);
+      domainEntry.label = getPreferredAnalyticsLabel(
+        domainEntry.label,
+        i.domain,
+      );
       domainEntry.count++;
     });
     const domainDistribution = Array.from(domainMap.entries())
@@ -414,7 +421,10 @@ export function useAnalyticsData() {
         });
       }
       const domainEntry = yearDomains.get(domainKey)!;
-      domainEntry.label = getPreferredAnalyticsLabel(domainEntry.label, i.domain);
+      domainEntry.label = getPreferredAnalyticsLabel(
+        domainEntry.label,
+        i.domain,
+      );
       domainEntry.count++;
     });
     // Get top 6 domains for the chart
