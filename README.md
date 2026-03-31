@@ -100,19 +100,11 @@ If you use `npm`, keep to `npm` consistently for install and scripts.
 
 ### 2. Create environment variables
 
-There is currently no committed `.env.example`, so create `.env` manually.
-
 ```bash
-DATABASE_URL="postgresql://USER:PASSWORD@HOST:5432/DB_NAME?schema=public"
-JWT_SECRET="replace-with-a-long-random-secret"
-SMTP_HOST="smtp.example.com"
-SMTP_PORT="587"
-SMTP_USER="user@example.com"
-SMTP_PASS="password"
-NEXT_PUBLIC_BASE_URL="http://localhost:3000"
-CRON_SECRET="replace-with-a-random-secret"
-NEXT_PUBLIC_ENABLE_REPORTS="true"
+cp .env.example .env
 ```
+
+Then update the values for your local database, JWT secret, SMTP provider, and base URL.
 
 ### 3. Run database migrations
 
@@ -262,7 +254,6 @@ Before deploying:
 
 ## Current Limitations
 
-- No `.env.example` file is committed yet
 - IP geolocation is still a placeholder integration
 - Middleware currently protects dashboard routes, not every teacher page
 - The repository contains both `pnpm-lock.yaml` and `package-lock.json`; use one package manager consistently in local development
