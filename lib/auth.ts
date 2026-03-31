@@ -1,5 +1,6 @@
 import jwt, { type Secret } from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
+import { createHash, randomBytes } from 'node:crypto'
 import { prisma } from './prisma'
 
 if (!process.env.JWT_SECRET) {
@@ -7,6 +8,8 @@ if (!process.env.JWT_SECRET) {
 }
 
 const JWT_SECRET: Secret = process.env.JWT_SECRET as Secret
+export const PASSWORD_MIN_LENGTH = 8
+export const PASSWORD_RESET_TOKEN_TTL_MS = 60 * 60 * 1000
 
 export interface AuthUser {
   id: string
@@ -59,4 +62,12 @@ export async function authenticateUser(email: string, password: string, role: 'S
 
 export function generateAttendanceToken(attendanceId: string): string {
   return generateToken({ attendanceId, type: 'attendance' }, '7d')
+}
+
+export function generatePasswordResetToken(): string {
+  return randomBytes(32).toString('hex')
+}
+
+export function hashPasswordResetToken(token: string): string {
+  return createHash('sha256').update(token).digest('hex')
 }

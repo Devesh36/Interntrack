@@ -100,6 +100,14 @@ export default function StudentLogin() {
                     required
                   />
                 </div>
+                <div className="text-right">
+                  <Link
+                    href="/forgot-password"
+                    className="text-sm text-blue-600 hover:underline"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>

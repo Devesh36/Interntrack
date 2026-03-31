@@ -103,6 +103,46 @@ export function generateAttendanceEmail(
   `;
 }
 
+export function generatePasswordResetEmail(
+  name: string,
+  resetUrl: string,
+): string {
+  return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <style>
+        .email-container { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; }
+        .header { background-color: #111827; color: white; padding: 20px; text-align: center; }
+        .content { padding: 30px 20px; line-height: 1.6; }
+        .button { display: inline-block; padding: 12px 30px; margin: 20px 0; text-decoration: none; border-radius: 8px; font-weight: bold; background-color: #2563EB; color: white; }
+        .footer { background-color: #f8f9fa; padding: 20px; text-align: center; color: #666; font-size: 12px; }
+      </style>
+    </head>
+    <body>
+      <div class="email-container">
+        <div class="header">
+          <h1>Reset Your Password</h1>
+        </div>
+        <div class="content">
+          <p>Hello ${name},</p>
+          <p>We received a request to reset your Interntrack password.</p>
+          <p>
+            <a href="${resetUrl}" class="button">Reset Password</a>
+          </p>
+          <p>This link is valid for 1 hour and can only be used once.</p>
+          <p>If you did not request a password reset, you can safely ignore this email.</p>
+        </div>
+        <div class="footer">
+          <p>This is an automated message from Interntrack.</p>
+          <p>Do not reply to this email.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+}
+
 //* Automated email to internship coordinator every 15 days
 export async function sendTeacherAttendanceReport(
   teacherEmail: string,
